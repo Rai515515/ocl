@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#050506">
+<title>OCULUS</title>
+<style>
+:root{--bg:#050506;--fg:#e9e6df;--dim:#5b5852;--acc:#ff2d4a;--amb:#ffb547;--line:#1a1a1d;--mono:ui-monospace,"SF Mono",Menlo,monospace}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--mono);overscroll-behavior:none}
+body{padding:calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 24px)}
+header{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.25em;color:var(--dim)}
+header b{color:var(--fg);font-weight:600}
+#cfg{background:none;border:1px solid var(--line);color:var(--dim);font:inherit;font-size:16px;width:36px;height:36px;border-radius:10px}
+#eyeWrap{position:relative;margin:14px auto 4px;max-width:360px}
+#eye{width:100%;display:block;overflow:visible}
+#eyeG{transform-origin:150px 80px;animation:blink 7s infinite}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.04)}}
+.lid{fill:#0c0c0e;stroke:#2a2a2e;stroke-width:1.2}
+.spin{transform-origin:150px 80px;animation:spin 40s linear infinite}
+.spin2{transform-origin:150px 80px;animation:spin 25s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+#pupil{transition:r .8s ease,transform 1.2s ease}
+#ring{transition:stroke-dashoffset .8s ease}
+#pct{text-align:center;font-size:12px;letter-spacing:.3em;color:var(--dim);margin-top:-4px}
+#pct b{color:var(--acc);font-size:26px;letter-spacing:.05em;font-weight:500}
+#meta{display:flex;justify-content:center;gap:18px;font-size:10px;letter-spacing:.2em;color:var(--dim);margin:8px 0 14px}
+#meta span b{color:var(--amb);font-weight:500}
+.row{border-top:1px solid var(--line);padding:12px 0 10px}
+.top{display:flex;align-items:baseline;justify-content:space-between}
+.tag{display:flex;align-items:baseline;gap:8px}
+.g{color:var(--acc);font-size:15px;width:16px;text-align:center}
+.c{font-size:13px;letter-spacing:.3em}
+.real{font-size:10px;color:var(--amb);letter-spacing:.1em;opacity:0;transition:opacity .3s}
+body.reveal .real{opacity:1}
+.num{font-size:22px;font-variant-numeric:tabular-nums;padding:2px 6px;border-radius:6px}
+.num small{font-size:11px;color:var(--dim)}
+.bar{height:2px;background:var(--line);margin:8px 0 10px;position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--acc);transition:width .5s}
+.bar i.done{background:var(--amb)}
+.btns{display:flex;gap:8px}
+.btns button{flex:1;height:40px;border:1px solid var(--line);background:#0b0b0d;color:var(--fg);font:inherit;font-size:13px;border-radius:10px;letter-spacing:.05em}
+.btns button:active{background:var(--acc);color:#000;border-color:var(--acc)}
+.btns button.neg{flex:.7;color:var(--dim)}
+.btns button.live{background:var(--acc);color:#000;border-color:var(--acc);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.6}}
+.week{display:flex;gap:4px;margin-top:10px}
+.week div{flex:1;text-align:center;font-size:9px;color:var(--dim)}
+.week i{display:block;height:22px;border-radius:4px;background:var(--acc);margin-bottom:3px}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 8px);transform:translateX(-50%) translateY(-80px);background:var(--acc);color:#000;font-size:11px;letter-spacing:.2em;padding:8px 14px;border-radius:8px;transition:transform .35s;z-index:9}
+#toast.on{transform:translateX(-50%) translateY(0)}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:8}
+.sheet.on{display:flex}
+.panel{width:100%;background:#0d0d10;border-top:1px solid var(--acc);border-radius:16px 16px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 18px);max-height:85vh;overflow:auto}
+.panel h3{margin:0 0 12px;font-size:11px;letter-spacing:.3em;color:var(--dim);font-weight:500}
+.panel label{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;letter-spacing:.2em}
+.panel input{-webkit-user-select:text;user-select:text;background:#000;border:1px solid var(--line);color:var(--fg);font:inherit;font-size:16px;width:110px;padding:8px;border-radius:8px;text-align:right}
+.panel .act{display:flex;gap:8px;margin-top:14px}
+.panel .act button{flex:1;height:44px;border-radius:10px;border:1px solid var(--line);background:#000;color:var(--fg);font:inherit;font-size:12px;letter-spacing:.15em}
+.panel .act button.p{background:var(--acc);color:#000;border-color:var(--acc)}
+.note{font-size:10px;color:var(--dim);line-height:1.6;margin-top:12px;letter-spacing:.05em}
+</style>
+</head>
+<body>
+<header><span><b>OCULUS</b> · SYS.VITAL</span><span id="clock"></span><button id="cfg" aria-label="settings">⌬</button></header>
+
+<div id="eyeWrap">
+<svg id="eye" viewBox="0 0 300 160">
+ <defs>
+  <clipPath id="lidClip"><path d="M8 80 Q150 -22 292 80 Q150 182 8 80Z"/></clipPath>
+  <radialGradient id="irisG" cx="50%" cy="50%" r="50%">
+   <stop offset="0%" stop-color="#2a0008"/><stop offset="70%" stop-color="#120004"/><stop offset="100%" stop-color="#050506"/>
+  </radialGradient>
+ </defs>
+ <g id="eyeG">
+  <path class="lid" d="M8 80 Q150 -22 292 80 Q150 182 8 80Z"/>
+  <g clip-path="url(#lidClip)">
+   <g id="ball">
+    <circle cx="150" cy="80" r="56" fill="url(#irisG)"/>
+    <circle class="spin" cx="150" cy="80" r="47" fill="none" stroke="#ff2d4a" stroke-opacity=".25" stroke-width="1" stroke-dasharray="2 5"/>
+    <circle class="spin2" cx="150" cy="80" r="38" fill="none" stroke="#ffb547" stroke-opacity=".2" stroke-width="1" stroke-dasharray="14 6 2 6"/>
+    <circle cx="150" cy="80" r="53" fill="none" stroke="#1d1d21" stroke-width="4"/>
+    <circle id="ring" cx="150" cy="80" r="53" fill="none" stroke="#ff2d4a" stroke-width="4" stroke-linecap="round" transform="rotate(-90 150 80)" stroke-dasharray="333" stroke-dashoffset="333"/>
+    <circle id="pupil" cx="150" cy="80" r="20" fill="#000"/>
+    <circle cx="160" cy="70" r="3.5" fill="#fff" fill-opacity=".8"/>
+   </g>
+  </g>
+ </g>
+</svg>
+</div>
+<div id="pct"><b id="pv">0</b>% SYNC</div>
+<div id="meta"><span>STREAK <b id="streak">0</b></span><span>DRF.LINK <b id="link">—</b></span></div>
+
+<div id="rows"></div>
+
+<div id="toast"></div>
+
+<div class="sheet" id="setSheet"><div class="panel">
+ <h3 id="setTitle">SET VALUE</h3>
+ <label><span id="setLbl"></span><input id="setIn" type="number" inputmode="decimal" step="any"></label>
+ <div class="act"><button data-x="close">CANCEL</button><button class="p" id="setOk">COMMIT</button></div>
+</div></div>
+
+<div class="sheet" id="cfgSheet"><div class="panel">
+ <h3>TARGETS / DAY</h3>
+ <div id="tgts"></div>
+ <div class="act"><button id="legendBtn">DECODE</button><button class="p" id="saveT">SAVE</button></div>
+ <h3 style="margin-top:22px">ARCHIVE</h3>
+ <div class="act"><button id="exp">EXPORT</button><button id="imp">IMPORT</button><button data-x="close">CLOSE</button></div>
+ <input type="file" id="impF" accept=".json,application/json" style="display:none">
+ <div class="note">Data lives only on this device. Triple-tap the eye to decode labels for 4 s. Tap any number to set it exactly. DRF.LINK = last walk sync from Health via Shortcut.</div>
+</div></div>
+
+<script>
+const K='oc_v1';
+const M=[
+ {id:'asc',g:'▲',c:'ASC',r:'push-ups',st:[1,5,10],t:50},
+ {id:'arc',g:'◓',c:'ARC',r:'sit-ups',st:[1,5,10],t:40},
+ {id:'flx',g:'◒',c:'FLX',r:'crunches',st:[1,5,10],t:40},
+ {id:'drf',g:'≈',c:'DRF',r:'walk km',st:[0.5,1],t:5,u:'km'},
+ {id:'arn',g:'◉',c:'ARN',r:'sport min',st:[5,15],t:30,u:'m'}
+];
+const $=s=>document.querySelector(s);
+const dk=d=>{d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function fresh(){return{targets:Object.fromEntries(M.map(m=>[m.id,m.t])),days:{},timer:null,link:null}}
+function load(){try{const s=JSON.parse(localStorage.getItem(K));if(s&&s.days&&s.targets)return s}catch(e){}return fresh()}
+let S=load();
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){toast('STORAGE BLOCKED')}}
+function day(k){k=k||dk();return S.days[k]||(S.days[k]={asc:0,arc:0,flx:0,drfH:0,drfA:0,arn:0})}
+function val(k,id){const d=S.days[k];let v=0;
+ if(d)v=id==='drf'?(d.drfH||0)+(d.drfA||0):(d[id]||0);
+ if(id==='arn'&&S.timer&&k===dk())v+=(Date.now()-S.timer)/60000;
+ return Math.max(0,v)}
+function fmt(id,v){return id==='drf'?v.toFixed(2):id==='arn'?Math.floor(v):Math.round(v)}
+function comp(k){let s=0;M.forEach(m=>{s+=Math.min(1,val(k,m.id)/(S.targets[m.id]||1))});return s/M.length}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
+
+/* Health link: Shortcut opens ...?w=<km today> */
+(function(){const p=new URLSearchParams(location.search);const w=p.get('w');
+ if(w!==null){const n=parseFloat(String(w).replace(',','.'));
+  if(isFinite(n)&&n>=0){day().drfH=Math.round(n*100)/100;S.link=Date.now();save();setTimeout(()=>toast('DRF LINKED · '+n.toFixed(2)),300)}
+  else setTimeout(()=>toast('DRF LINK FAILED'),300);
+  history.replaceState(null,'',location.pathname)}})();
+
+function add(id,n){const d=day();
+ if(id==='drf'){d.drfA=Math.max(-(d.drfH||0),Math.round(((d.drfA||0)+n)*100)/100)}
+ else d[id]=Math.max(0,(d[id]||0)+n);
+ if(navigator.vibrate)navigator.vibrate(8);save();render()}
+function setv(id,v){const d=day();if(!isFinite(v)||v<0)return;
+ if(id==='drf')d.drfA=Math.round((v-(d.drfH||0))*100)/100;else{if(id==='arn'&&S.timer)S.timer=Date.now();d[id]=v}
+ save();render()}
+function timer(){if(S.timer){day().arn=(day().arn||0)+(Date.now()-S.timer)/60000;S.timer=null;toast('ARN LOGGED')}else{S.timer=Date.now();toast('ARN LIVE')}save();render()}
+
+function build(){$('#rows').innerHTML=M.map(m=>{
+ const b=m.st.map(s=>`<button data-a="${m.id}" data-n="${s}">+${s}</button>`).join('');
+ const neg=`<button class="neg" data-a="${m.id}" data-n="-${m.st[0]}">−${m.st[0]}</button>`;
+ const tm=m.id==='arn'?`<button id="tbtn" data-t="1">▶</button>`:'';
+ return `<div class="row"><div class="top"><div class="tag"><span class="g">${m.g}</span><span class="c">${m.c}</span><span class="real">${m.r}</span></div>
+ <div class="num" data-s="${m.id}"><span id="v_${m.id}">0</span><small>/<span id="t_${m.id}"></span>${m.u||''}</small></div></div>
+ <div class="bar"><i id="b_${m.id}"></i></div><div class="btns">${neg}${b}${tm}</div></div>`}).join('')+
+ `<div class="row"><div class="top"><div class="tag"><span class="g">◇</span><span class="c">7D</span></div></div><div class="week" id="week"></div></div>`}
+
+function render(){const k=dk();M.forEach(m=>{const v=val(k,m.id),t=S.targets[m.id];
+ $('#v_'+m.id).textContent=fmt(m.id,v);$('#t_'+m.id).textContent=t;
+ const b=$('#b_'+m.id);b.style.width=Math.min(100,v/t*100)+'%';b.classList.toggle('done',v>=t)});
+ const c=comp(k);$('#pv').textContent=Math.round(c*100);
+ $('#ring').setAttribute('stroke-dashoffset',333*(1-c));
+ $('#ring').setAttribute('stroke',c>=1?'#ffb547':'#ff2d4a');
+ $('#pupil').setAttribute('r',(26-c*14).toFixed(1));
+ const tb=$('#tbtn');if(tb){tb.textContent=S.timer?'■':'▶';tb.classList.toggle('live',!!S.timer)}
+ // streak: consecutive days with any activity, today optional
+ let st=0,d=new Date();if(comp(dk(d))===0)d.setDate(d.getDate()-1);
+ while(comp(dk(d))>0){st++;d.setDate(d.getDate()-1)}
+ $('#streak').textContent=st;
+ $('#link').textContent=S.link?new Date(S.link).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}):'—';
+ let w='';for(let i=6;i>=0;i--){const x=new Date();x.setDate(x.getDate()-i);const cc=comp(dk(x));
+  w+=`<div><i style="opacity:${(0.08+cc*0.92).toFixed(2)}${cc>=1?';background:#ffb547':''}"></i>${'SMTWTFS'[x.getDay()]}</div>`}
+ $('#week').innerHTML=w;
+ $('#clock').textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false})}
+
+let setId=null;
+document.addEventListener('click',e=>{const t=e.target.closest('button,[data-s]');if(!t)return;
+ if(t.dataset.a)return add(t.dataset.a,parseFloat(t.dataset.n));
+ if(t.dataset.t)return timer();
+ if(t.dataset.s){setId=t.dataset.s;const m=M.find(x=>x.id===setId);
+  $('#setLbl').textContent=m.g+' '+m.c;$('#setIn').value=fmt(setId,val(dk(),setId));$('#setSheet').classList.add('on');setTimeout(()=>$('#setIn').focus(),50);return}
+ if(t.dataset.x==='close')return document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('on'))});
+$('#setOk').onclick=()=>{setv(setId,parseFloat(String($('#setIn').value).replace(',','.')));$('#setSheet').classList.remove('on')};
+document.querySelectorAll('.sheet').forEach(s=>s.addEventListener('click',e=>{if(e.target===s)s.classList.remove('on')}));
+
+$('#cfg').onclick=()=>{$('#tgts').innerHTML=M.map(m=>`<label><span>${m.g} ${m.c}</span><input type="number" inputmode="decimal" step="any" data-tg="${m.id}" value="${S.targets[m.id]}"></label>`).join('');$('#cfgSheet').classList.add('on')};
+$('#saveT').onclick=()=>{document.querySelectorAll('[data-tg]').forEach(i=>{const v=parseFloat(i.value);if(v>0)S.targets[i.dataset.tg]=v});save();render();$('#cfgSheet').classList.remove('on');toast('TARGETS SET')};
+function reveal(){document.body.classList.add('reveal');clearTimeout(reveal._t);reveal._t=setTimeout(()=>document.body.classList.remove('reveal'),4000)}
+$('#legendBtn').onclick=()=>{$('#cfgSheet').classList.remove('on');reveal()};
+let taps=[];$('#eyeWrap').addEventListener('click',()=>{const n=Date.now();taps=taps.filter(x=>n-x<600);taps.push(n);if(taps.length>=3){taps=[];reveal()}});
+
+$('#exp').onclick=async()=>{const name='oculus-'+dk()+'.json';const blob=new Blob([JSON.stringify(S)],{type:'application/json'});
+ try{const f=new File([blob],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e.name==='AbortError')return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click()};
+$('#imp').onclick=()=>$('#impF').click();
+$('#impF').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.days||!d.targets)throw 0;S=d;save();render();toast('ARCHIVE RESTORED')}catch(x){toast('BAD FILE')}};r.readAsText(f)};
+
+// pupil drift = "watching you"
+setInterval(()=>{const p=$('#pupil');p.style.transform=`translate(${(Math.random()*10-5).toFixed(1)}px,${(Math.random()*6-3).toFixed(1)}px)`},2600);
+
+build();render();setInterval(render,15000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+</script>
+</body>
+</html>
